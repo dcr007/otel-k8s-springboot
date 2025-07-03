@@ -1,0 +1,4 @@
+apiVersion: v2
+name: otel-k8s-springboot
+version: 0.1.0
+description: Kubernetes Helm chart for OpenTelemetry + Spring Boot

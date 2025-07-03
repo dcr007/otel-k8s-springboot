@@ -1,0 +1,19 @@
+springboot:
+  image: springboot-app:latest
+  port: 8080
+
+otel:
+  collectorConfig: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
+    exporters:
+      logging:
+        loglevel: debug
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          exporters: [logging]

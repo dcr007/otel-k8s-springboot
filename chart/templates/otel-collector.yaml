@@ -1,0 +1,26 @@
+# otel-collector.yaml
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: otel-collector
+  namespace: default
+spec:
+  mode: deployment
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
+    exporters:
+      logging:
+        loglevel: debug
+    jaeger:
+        endpoint: "jaeger.default.svc.cluster.local:14250"
+        tls:
+        insecure: true
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          exporters: [logging, jaeger]
