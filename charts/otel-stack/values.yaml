@@ -1,0 +1,29 @@
+otelCollector:
+  image: otel/opentelemetry-collector-contrib:latest
+  config:
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
+
+    exporters:
+      logging:
+        loglevel: debug
+      jaeger:
+        endpoint: jaeger.observability.svc.cluster.local:14250
+        tls:
+          insecure: true
+
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          exporters: [logging, jaeger]
+        metrics:
+          receivers: [otlp]
+          exporters: [logging]
+
+jaeger:
+  enabled: true
+  image: jaegertracing/all-in-one:1.52.0

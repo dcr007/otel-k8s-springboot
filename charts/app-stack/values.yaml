@@ -1,0 +1,14 @@
+orderService:
+  image: order-service:0.0.1-SNAPSHOT
+  port: 8080
+
+paymentService:
+  image: payment-service:0.0.1-SNAPSHOT
+  port: 8081
+
+postgres:
+  image: postgres:latest
+  dbName: opentelemetry
+  username: username
+  password: password
+  port: 5432

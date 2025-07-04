@@ -1,0 +1,16 @@
+# instrumentation.yaml
+# This file defines the OpenTelemetry instrumentation for a Spring Boot application.
+# It specifies the OpenTelemetry collector endpoint and the Java autoinstrumentation image.
+# To apply this configuration, save it as `instrumentation.yaml` and run:
+# kubectl apply -f instrumentation.yaml
+
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: springboot-instrumentation
+  namespace: demo-apps # <<-- Must match where Spring Boot apps are deployed
+spec:
+  exporter:
+    endpoint: http://otel-collector.observability.svc.cluster.local:4317 # <<-- Fixed to correct namespace
+  java:
+    image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:latest

@@ -1,0 +1,41 @@
+# app-stack/templates/payment-service.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+  namespace: demo-apps
+  labels:
+    app: payment-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment-service
+  template:
+    metadata:
+      labels:
+        app: payment-service
+      annotations:
+        instrumentation.opentelemetry.io/inject-java: "true"
+    spec:
+      containers:
+        - name: payment-service
+          image: {{ .Values.paymentService.image }}
+          ports:
+            - containerPort: {{ .Values.paymentService.port }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service
+  namespace: demo-apps
+spec:
+  selector:
+    app: payment-service
+  ports:
+    - protocol: TCP
+      port: {{ .Values.paymentService.port }}
+      targetPort: {{ .Values.paymentService.port }}
+
+---

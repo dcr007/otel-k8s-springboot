@@ -1,0 +1,38 @@
+# Maven build output
+/target/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+*.bak
+
+# MacOS
+.DS_Store
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# Helm chart build artifacts (if you package charts)
+*.tgz
+
+# Kubernetes configs that shouldn't be committed
+*.kubeconfig
+*.env
+
+# Docker related
+*.tar
+docker-compose.override.yml
+
+# System files
+Thumbs.db
+
+# Node modules (if you ever add frontend)
+/node_modules/
+
+# OS-specific metadata
+ehthumbs.db

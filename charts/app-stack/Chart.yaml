@@ -1,0 +1,7 @@
+# app-stack/Chart.yaml
+
+apiVersion: v2
+name: app-stack
+description: Helm chart for deploying Spring Boot applications and Postgres
+version: 0.1.0
+appVersion: "1.0"

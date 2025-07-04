@@ -1,51 +1,118 @@
 # otel-k8s-springboot
 
-A sample Helm chart that deploys:
+A complete Helm-based deployment example for end-to-end OpenTelemetry observability on Kubernetes, including multiple Spring Boot microservices and PostgreSQL.
+
+## What’s Included
 
 * OpenTelemetry Operator and Java auto-instrumentation
-* OTEL Collector (logging mode)
-* Spring Boot application (with OTEL auto-injection)
+* OTEL Collector (with logging + Jaeger exporters)
+* Jaeger for distributed trace visualization
+* Spring Boot Microservices: `order-service` and `payment-service`
+* PostgreSQL backend
+
+---
 
 ## Prerequisites
 
 * [Install cert-manager on Kubernetes](cert-manager-install.md)
-* Minikube or kind installed
+* Minikube installed
 * Docker and kubectl installed
 * Helm installed
 
-## Setup
+---
+
+## Kubernetes Namespace Layout
+
+| Component              | Namespace       |
+| ---------------------- | --------------- |
+| OTEL Collector         | `observability` |
+| Jaeger                 | `observability` |
+| OpenTelemetry Operator | `observability` |
+| Spring Boot apps       | `demo-apps`     |
+| Postgres database      | `demo-apps`     |
+| Instrumentation CRD    | `demo-apps`     |
+
+---
+
+## Setup Instructions
 
 ```bash
+# Clone repository
 git clone <repo-url>
 cd otel-k8s-springboot
 
-# Start local Kubernetes
+# Start Minikube
 minikube start --cpus=4 --memory=4g
 
-# Install Operator (namespace "observability")
+# Create namespaces
 kubectl create namespace observability
+kubectl create namespace demo-apps
+
+# Install OpenTelemetry Operator
 helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
 helm install otel-operator open-telemetry/opentelemetry-operator \
   --namespace observability
 
-# Build Spring Boot image (if needed)
+# Install OTEL Collector and Jaeger (observability namespace)
+helm install otel-stack ./charts/otel-stack -n observability
+
+# (Optional) Install Jaeger separately
+helm repo add jaegertracing https://jaegertracing.github.io/helm-charts
+helm install jaeger jaegertracing/jaeger -n observability
+
+# Build Spring Boot images
 cd src
 mvn package
-docker build -t springboot-app:latest .
-
+# Build order-service
+docker build -t order-service:0.0.1-SNAPSHOT ./order-service
+# Build payment-service
+docker build -t payment-service:0.0.1-SNAPSHOT ./payment-service
 cd ..
-helm install telemetry . --namespace default
+
+# Install Spring Boot app stack (demo-apps namespace)
+helm install app-stack ./charts/app-stack -n demo-apps
+
+# Install Otel stack for the collector and Jaeger(observability namespace)
+helm install otel-stack ./charts/otel-stack -n observability
+
+# Apply instrumentation configuration
+kubectl apply -f instrumentation.yaml -n demo-apps
 ```
 
-## Verify
+---
+
+## Verify Deployment
 
 ```bash
-kubectl get pods
-minikube service springboot-app --url   # to generate trace
-kubectl logs deploy/otel-collector     # view trace logs
+kubectl get pods -n observability          # Check OTEL Collector and Jaeger
+kubectl get pods -n demo-apps              # Check Spring Boot apps and Postgres
+
+minikube service order-service -n demo-apps --url
+minikube service payment-service -n demo-apps --url
+
+kubectl logs deploy/otel-collector -n observability
 ```
 
-## Extending
+## Access Jaeger UI
 
-* Swap logging exporter with Jaeger, Prometheus, etc.
-* Add metrics, logs, or node-level instrumentation.
+```bash
+minikube service jaeger-query -n observability --url
+```
+
+---
+
+## Extending and Customizing
+
+* Add Prometheus exporter to OTEL Collector for metrics
+* Add Grafana dashboards
+* Add Loki for logs aggregation
+* Deploy in multi-node Kubernetes clusters
+
+---
+
+## Notes
+
+* The Instrumentation CRD must be in the same namespace as the applications (`demo-apps`).
+* The OTEL Collector and Jaeger must run in the `observability` namespace.
+* All microservices are configured to send telemetry to the OTEL Collector.
+* This setup uses separate Helm charts for the observability stack (`otel-stack`) and the application stack (`app-stack`).
