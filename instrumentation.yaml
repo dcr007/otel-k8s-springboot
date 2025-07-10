@@ -11,6 +11,6 @@ metadata:
   namespace: demo-apps # <<-- Must match where Spring Boot apps are deployed
 spec:
   exporter:
-    endpoint: http://otel-collector.observability.svc.cluster.local:4317 # <<-- Fixed to correct namespace
+    endpoint: http://otel-collector-collector.observability.svc.cluster.local:4317 # <<-- Fixed to correct namespace
   java:
     image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:latest
