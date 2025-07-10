@@ -58,6 +58,7 @@ helm install otel-stack ./charts/otel-stack -n observability
 
 # (Optional) Install Jaeger separately
 helm repo add jaegertracing https://jaegertracing.github.io/helm-charts
+helm repo update
 helm install jaeger jaegertracing/jaeger -n observability
 
 # Build Spring Boot images
