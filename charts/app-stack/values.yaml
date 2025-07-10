@@ -1,9 +1,11 @@
 orderService:
-  image: order-service:0.0.1-SNAPSHOT
+  image: 465062709130.dkr.ecr.us-east-1.amazonaws.com/ews-order-service:0.0.1-SNAPSHOT-arm64
+  imagePullPolicy: Always
   port: 8080
 
 paymentService:
-  image: payment-service:0.0.1-SNAPSHOT
+  image: 465062709130.dkr.ecr.us-east-1.amazonaws.com/ews-payment-service:0.0.1-SNAPSHOT-arm64
+  imagePullPolicy: Always
   port: 8081
 
 postgres:

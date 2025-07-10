@@ -5,7 +5,7 @@ metadata:
   namespace: observability
 spec:
   mode: deployment
-  image: otel/opentelemetry-collector-contrib:latest  # Pin version to avoid surprises
+  image: otel/opentelemetry-collector-contrib:latest
   config: |
     receivers:
       otlp:
@@ -15,17 +15,19 @@ spec:
 
     exporters:
       debug:
-        verbosity: detailed   # replaces logging exporter
-      otlp:
-        endpoint: jaeger-collector.observability.svc.cluster.local:4317
-        tls:
-          insecure: true
+        verbosity: detailed
+
+      otlphttp/honeycomb:
+        endpoint: https://api.honeycomb.io
+        headers:
+          "x-honeycomb-team": "HONEYCOMB_API_KEY"
+          "x-honeycomb-dataset": "springboot-demo"
 
     service:
       pipelines:
         traces:
           receivers: [otlp]
-          exporters: [debug, otlp]
+          exporters: [debug, otlphttp/honeycomb]
         metrics:
           receivers: [otlp]
           exporters: [debug]
