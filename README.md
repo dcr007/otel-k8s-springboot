@@ -88,19 +88,26 @@ kubectl apply -f instrumentation.yaml -n demo-apps
 kubectl get pods -n observability          # Check OTEL Collector and Jaeger
 kubectl get pods -n demo-apps              # Check Spring Boot apps and Postgres
 
-minikube service order-service -n demo-apps --url
-minikube service payment-service -n demo-apps --url
+minikube service order-service -n demo-apps --url &
+minikube service payment-service -n demo-apps --url &
 
 kubectl logs deploy/otel-collector -n observability
 ```
 
 ## Access Jaeger UI
 
-```bash
-minikube service jaeger-query -n observability --url
+```shell
+     minikube service jaeger-query -n observability --url
 ```
-
+# via Port forwarding 
+```shell 
+    export POD_NAME=$(kubectl get pods --namespace observability -l "app.kubernetes.io/instance=jaeger,app.kubernetes.io/component=query" -o jsonpath="{.items[0].metadata.name}")
+```
+```shell  
+   kubectl port-forward --namespace observability $POD_NAME 8080:16686
+```
 ---
+
 
 ## Extending and Customizing
 
