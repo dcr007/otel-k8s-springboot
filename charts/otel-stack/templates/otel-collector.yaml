@@ -21,15 +21,22 @@ spec:
         tls:
           insecure: true
 
+    processors:
+      batch: {}  
+
     service:
-      telemetry:
-        metrics:
-          address: ":8889"  # Expose metrics for Prometheus scraping
       pipelines:
         traces:
           receivers: [otlp]
+          processors: [batch]
           exporters: [debug, otlp]
 
         metrics:
           receivers: [otlp]
+          processors: [batch]
+          exporters: [debug]
+
+        logs:
+          receivers: [otlp]
+          processors: [batch]
           exporters: [debug]

@@ -59,7 +59,13 @@ helm install otel-stack ./charts/otel-stack -n observability
 # (Optional) Install Jaeger separately
 helm repo add jaegertracing https://jaegertracing.github.io/helm-charts
 helm repo update
-helm install jaeger jaegertracing/jaeger -n observability
+helm upgrade --install jaeger jaegertracing/jaeger \
+  --namespace observability \
+  --set storage.type=memory \
+  --set collector.enabled=true \
+  --set agent.enabled=true \
+  --set query.enabled=true
+
 
 # Build Spring Boot images
 cd src
@@ -99,7 +105,7 @@ kubectl logs deploy/otel-collector -n observability
 ```shell
      minikube service jaeger-query -n observability --url
 ```
-# via Port forwarding 
+  ### via Port forwarding 
 ```shell 
     export POD_NAME=$(kubectl get pods --namespace observability -l "app.kubernetes.io/instance=jaeger,app.kubernetes.io/component=query" -o jsonpath="{.items[0].metadata.name}")
 ```

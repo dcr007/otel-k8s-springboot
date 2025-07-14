@@ -1,5 +1,5 @@
 otelCollector:
-  image: otel/opentelemetry-collector-contrib:latest
+  image: otel/opentelemetry-collector-contrib:0.99.0
   config:
     receivers:
       otlp:
@@ -12,16 +12,24 @@ otelCollector:
         loglevel: debug
       jaeger:
         endpoint: jaeger.observability.svc.cluster.local:14250
-        tls:
-          insecure: true
+        insecure: true
+
+    processors:
+      batch: {}
 
     service:
       pipelines:
         traces:
           receivers: [otlp]
+          processors: [batch]
           exporters: [logging, jaeger]
         metrics:
           receivers: [otlp]
+          processors: [batch]
+          exporters: [logging]
+        logs:
+          receivers: [otlp]
+          processors: [batch]
           exporters: [logging]
 
 jaeger:
